@@ -35,6 +35,18 @@
   #tabs { display:flex; gap:6px; padding:6px 12px; background:#23242b; border-bottom:1px solid #3a3b45; }
   .tab.active { background:#4a5d7e; border-color:#5d7bb0; }
   #inspectorPre { flex:1; margin:0; padding:12px; overflow:auto; white-space:pre-wrap; word-break:break-all; font:12px Menlo, monospace; }
+  #logPanel { display:none; flex-direction:column; height:240px; background:#191a1f; border-top:1px solid #3a3b45; }
+  #logBar { display:flex; align-items:center; gap:8px; padding:6px 12px; background:#23242b; border-bottom:1px solid #3a3b45; }
+  #logBar .lbl { color:#7ec8ff; }
+  #logPath { flex:1; color:#9a9ba5; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:rtl; text-align:left; }
+  #logBar button { padding:3px 9px; font-size:12px; }
+  #logPre { flex:1; overflow:auto; margin:0; padding:8px 12px; font:11.5px Menlo, monospace; white-space:pre-wrap; word-break:break-word; }
+  .logline { padding:1px 0; border-bottom:1px solid #202128; }
+  .logline .lt { color:#6d6e78; }
+  .logline .ls { color:#7ec8ff; }
+  .logline .ld { color:#9a9ba5; padding-left:14px; white-space:pre-wrap; }
+  .lv-warn { color:#ffb86b; }
+  .lv-error { color:#ff6b6b; }
   footer { padding:8px 14px; background:#20212a; border-top:1px solid #3a3b45; color:#9a9ba5; font-size:12px; }
   footer b { background:#2b2c33; padding:1px 6px; border-radius:4px; color:#7ec8ff; font-weight:normal; }
 </style>
@@ -46,7 +58,8 @@
   <button id="stopBtn" disabled>Stop Proxy</button>
   <button id="clearBtn">Clear</button>
   <button id="composerToggle">Composer</button>
-  <span id="proxyBadge" class="badge off">o Proxy stopped</span>
+  <button id="logToggle">Log</button>
+  <span id="proxyBadge" class="badge off">● Proxy stopped</span>
 </header>
 
 <div id="composerPanel">
@@ -77,6 +90,16 @@
     <button class="tab active" data-tab="resBody">Response Body</button>
   </div>
   <pre id="inspectorPre"></pre>
+</div>
+
+<div id="logPanel">
+  <div id="logBar">
+    <span class="lbl">Log</span>
+    <span id="logPath">(locating log file...)</span>
+    <button id="logRevealBtn">Reveal log file</button>
+    <button id="logClearBtn">Clear log</button>
+  </div>
+  <div id="logPre"></div>
 </div>
 
 <footer>

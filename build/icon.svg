@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- App-theme dark tile, matching the UI chrome (#26272e / #1a1b20) -->
+    <linearGradient id="tile" gradientUnits="userSpaceOnUse" x1="512" y1="100" x2="512" y2="924">
+      <stop offset="0%"   stop-color="#363948"/>
+      <stop offset="55%"  stop-color="#23252d"/>
+      <stop offset="100%" stop-color="#14151a"/>
+    </linearGradient>
+    <!-- horizontal gradients need user space: a flat shaft has a zero-height bbox -->
+    <linearGradient id="req" gradientUnits="userSpaceOnUse" x1="270" y1="0" x2="800" y2="0">
+      <stop offset="0%"   stop-color="#4aa8f0"/>
+      <stop offset="100%" stop-color="#a5dbff"/>
+    </linearGradient>
+    <linearGradient id="res" gradientUnits="userSpaceOnUse" x1="754" y1="0" x2="224" y2="0">
+      <stop offset="0%"   stop-color="#2fbd7d"/>
+      <stop offset="100%" stop-color="#8bedc0"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+  </defs>
+
+  <!-- macOS Big Sur squircle proportions: 824x824 content, r=185 -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#tile)"/>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="none"
+        stroke="#ffffff" stroke-opacity="0.10" stroke-width="3"/>
+
+  <!-- the intercept seam: traffic is cut open in the middle -->
+  <line x1="512" y1="228" x2="512" y2="796" stroke="#9297ad" stroke-opacity="0.28"
+        stroke-width="11" stroke-linecap="round" stroke-dasharray="3 48"/>
+
+  <!-- request: outbound, to the right -->
+  <g filter="url(#soft)" opacity="0.45">
+    <path d="M 296 428 L 700 428" stroke="#4aa8f0" stroke-width="66" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M 296 428 L 648 428" stroke="url(#req)" stroke-width="66" stroke-linecap="round" fill="none"/>
+  <path d="M 612 330 L 612 526 L 790 428 Z" fill="url(#req)" stroke="url(#req)"
+        stroke-width="40" stroke-linejoin="round"/>
+
+  <!-- response: inbound, to the left -->
+  <g filter="url(#soft)" opacity="0.45">
+    <path d="M 728 596 L 324 596" stroke="#2fbd7d" stroke-width="66" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M 728 596 L 376 596" stroke="url(#res)" stroke-width="66" stroke-linecap="round" fill="none"/>
+  <path d="M 412 498 L 412 694 L 234 596 Z" fill="url(#res)" stroke="url(#res)"
+        stroke-width="40" stroke-linejoin="round"/>
+</svg>

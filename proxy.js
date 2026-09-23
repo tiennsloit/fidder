@@ -8,11 +8,17 @@ const { URL } = require('url');
 const MAX_BODY = 200 * 1024; // capture at most 200 KB per body
 const MAX_SESSIONS = 500;
 const UPSTREAM_TIMEOUT = 30000;
-function FDL(m){if(!process.env.FIDDLER_DEBUG)return;try{require('fs').appendFileSync('/tmp/fiddler-debug.log',new Date().toISOString()+' '+m+String.fromCharCode(10));}catch(e){}}
 try { net.setDefaultAutoSelectFamily(true); } catch (e) {}
 try { dns.setDefaultResultOrder('ipv4first'); } catch (e) {}
 
-function createEngine() {
+const NOOP_LOG = {
+  info: function () {}, warn: function () {}, error: function () {}, raw: function () {}
+};
+
+function createEngine(logger) {
+  const log = logger || NOOP_LOG;
+  // Verbose per-request tracing; on only when FIDDLER_DEBUG is set.
+  function FDL(m) { if (process.env.FIDDLER_DEBUG) log.info('proxy.trace', m); }
   const sessions = [];
   let nextId = 1;
 
@@ -100,6 +106,8 @@ function createEngine() {
           clientRes.writeHead(upRes.statusCode, headers);
           clientRes.end(resBody);
           FDL('SENT '+upRes.statusCode+' len='+(resBody&&resBody.length));
+          log.info('proxy', clientReq.method + ' ' + target.href + ' -> ' + upRes.statusCode
+            + ' (' + (Date.now() - started) + ' ms, ' + resBody.length + ' B)');
         });
       });
        upReq.setTimeout(UPSTREAM_TIMEOUT, () => upReq.destroy(new Error('Upstream timeout')));
@@ -109,6 +117,7 @@ function createEngine() {
        upReq.on('close', () => clearTimeout(connectWatch));
       upReq.on('error', (err) => {
         FDL('UPREQ_ERR '+(err && err.message));
+        log.error('proxy', clientReq.method + ' ' + target.href + ' failed', err);
         addSession({
           kind: 'proxy',
           time: new Date(started).toISOString(),
@@ -145,6 +154,7 @@ function createEngine() {
       if (head && head.length) upstream.write(head);
       upstream.pipe(clientSocket);
       clientSocket.pipe(upstream);
+      log.info('proxy', 'CONNECT ' + host + ':' + port + ' tunnel established');
       addSession({
         kind: 'tunnel',
         time: new Date(started).toISOString(),
@@ -164,6 +174,7 @@ function createEngine() {
       });
     });
     upstream.on('error', (err) => {
+      log.error('proxy', 'CONNECT ' + host + ':' + port + ' failed', err);
       addSession({
         kind: 'tunnel',
         time: new Date(started).toISOString(),
@@ -261,6 +272,12 @@ function createEngine() {
 
   const server = http.createServer(handleProxyRequest);
   server.on('connect', handleConnect);
+  // A listen failure after startup (or a malformed client) must not be silent.
+  server.on('error', (err) => log.error('proxy', 'Server error', err));
+  server.on('clientError', (err, socket) => {
+    log.warn('proxy', 'Client error: ' + (err && err.message));
+    if (socket.writable) socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  });
 
   let running = false;
   let currentPort = null;
@@ -268,10 +285,22 @@ function createEngine() {
   const engine = {
     start(port) {
       return new Promise((resolve, reject) => {
-        if (running) return resolve(engine.status());
-        server.once('error', reject);
+        if (running) {
+          log.info('proxy', 'Already running on 127.0.0.1:' + currentPort);
+          return resolve(engine.status());
+        }
+        const onErr = (err) => {
+          // The most common one by far: another process already holds the port.
+          if (err && err.code === 'EADDRINUSE') {
+            err.message = 'Port ' + (port || 8888) + ' is already in use '
+              + '(another Fiddler window or process is listening). '
+              + 'Close it, or run: lsof -nP -iTCP:' + (port || 8888) + ' -sTCP:LISTEN';
+          }
+          reject(err);
+        };
+        server.once('error', onErr);
         server.listen(port || 8888, '127.0.0.1', () => {
-          server.removeListener('error', reject);
+          server.removeListener('error', onErr);
           running = true;
           currentPort = server.address().port;
           resolve(engine.status());

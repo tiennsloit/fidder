@@ -6,10 +6,12 @@ productName: Fiddler
 mac:
   target: dmg
   category: public.app-category.utilities
+  icon: build/icon.icns
 dmg:
   title: Fiddler
   window:
     width: 660
     height: 400
+  icon: build/icon.icns
 files: []
 electronVersion: 27.3.11

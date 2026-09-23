@@ -16,17 +16,38 @@
     "productName": "Fiddler",
     "mac": {
       "target": "dmg",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.icns"
     },
     "dmg": {
       "title": "Fiddler",
       "window": {
         "width": 660,
         "height": 400
-      }
+      },
+      "icon": "build/icon.icns"
     },
     "directories": {
-      "output": ""
-    }
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "proxy.js",
+      "logger.js",
+      "index.html",
+      "package.json",
+      "!**/*.dmg",
+      "!**/*.blockmap",
+      "!dist",
+      "!mac-arm64",
+      "!build",
+      "!test-proxy.js",
+      "!.claude-memory",
+      "!builder-debug.yml",
+      "!builder-effective-config.yaml"
+    ]
   }
 }

@@ -1,4 +1,8 @@
+node_modules
+dist
+mac-arm64
+mac-arm64.tmp
 *.dmg
 *.dmg.*
-node_modules
-mac-arm64
+builder-debug.yml
+builder-effective-config.yaml
