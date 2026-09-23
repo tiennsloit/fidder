@@ -6,7 +6,8 @@
   "productName": "Fiddler",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --mac dmg"
+    "dist": "electron-builder --mac dmg",
+    "predist": "rm -rf dist"
   },
   "devDependencies": {
     "electron": "^27.0.0"
