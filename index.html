@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fiddler - Simple HTTP Debugger</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#1e1f24; color:#e8e8ec; font:13px -apple-system, Menlo, monospace; height:100vh; display:flex; flex-direction:column; }
+  header { padding:10px 14px; background:#26272e; border-bottom:1px solid #3a3b45; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0 10px 0 0; color:#7ec8ff; }
+  button { background:#3a3b45; color:#e8e8ec; border:1px solid #4c4d58; border-radius:6px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover:not(:disabled) { background:#4a4b57; }
+  button:disabled { opacity:.45; cursor:default; }
+  .badge { padding:5px 10px; border-radius:20px; border:1px solid #4c4d58; }
+  .badge.on { color:#57d99d; border-color:#2f5d47; }
+  .badge.off { color:#ff9c6b; border-color:#6b4a36; }
+  #composerPanel { display:none; padding:12px 14px; background:#23242b; border-bottom:1px solid #3a3b45; }
+  #composerPanel .row1 { display:flex; gap:8px; margin-bottom:8px; }
+  select, input[type=text], textarea { background:#1a1b20; color:#e8e8ec; border:1px solid #4c4d58; border-radius:6px; padding:6px 8px; font:inherit; }
+  #compUrl { flex:1; }
+  #composerPanel textarea { width:100%; height:54px; margin-bottom:8px; resize:vertical; }
+  #tableWrap { flex:1.2; overflow:auto; border-bottom:1px solid #3a3b45; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:5px 10px; border-bottom:1px solid #2b2c33; white-space:nowrap; }
+  th { position:sticky; top:0; background:#26272e; z-index:1; }
+  tr.row { cursor:pointer; }
+  tr.row:hover { background:#2c2d36; }
+  tr.selected { background:#34495e; }
+  td.url { max-width:520px; overflow:hidden; text-overflow:ellipsis; }
+  .empty { color:#8a8b95; text-align:center; padding:20px; }
+  .st2 { color:#57d99d; } .st3 { color:#7ec8ff; } .st4 { color:#ffb86b; } .st5 { color:#ff6b6b; } .st0 { color:#c9a0ff; }
+  .err { color:#ff6b6b; }
+  #inspector { flex:1; display:flex; flex-direction:column; min-height:220px; }
+  #sessionInfo { padding:7px 12px; background:#26272e; border-bottom:1px solid #3a3b45; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #tabs { display:flex; gap:6px; padding:6px 12px; background:#23242b; border-bottom:1px solid #3a3b45; }
+  .tab.active { background:#4a5d7e; border-color:#5d7bb0; }
+  #inspectorPre { flex:1; margin:0; padding:12px; overflow:auto; white-space:pre-wrap; word-break:break-all; font:12px Menlo, monospace; }
+  footer { padding:8px 14px; background:#20212a; border-top:1px solid #3a3b45; color:#9a9ba5; font-size:12px; }
+  footer b { background:#2b2c33; padding:1px 6px; border-radius:4px; color:#7ec8ff; font-weight:normal; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fiddler - Simple HTTP Debugger</h1>
+  <button id="startBtn">Start Proxy</button>
+  <button id="stopBtn" disabled>Stop Proxy</button>
+  <button id="clearBtn">Clear</button>
+  <button id="composerToggle">Composer</button>
+  <span id="proxyBadge" class="badge off">o Proxy stopped</span>
+</header>
+
+<div id="composerPanel">
+  <div class="row1">
+    <select id="compMethod">
+      <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+    </select>
+    <input type="text" id="compUrl" placeholder="https://api.example.com/endpoint">
+    <button id="compSend">Send</button>
+  </div>
+  <textarea id="compHeaders" placeholder="Headers, one per line: Content-Type: application/json, Authorization: Bearer ..."></textarea>
+  <textarea id="compBody" placeholder="Request body (optional)"></textarea>
+</div>
+
+<div id="tableWrap">
+  <table>
+    <thead><tr><th>#</th><th>Result</th><th>Proto</th><th>Method</th><th>URL</th><th>Time</th><th>Elapsed</th><th>Size</th><th>Error</th></tr></thead>
+    <tbody id="tblBody"><tr><td colspan="9" class="empty">No sessions captured yet</td></tr></tbody>
+  </table>
+</div>
+
+<div id="inspector">
+  <div id="sessionInfo">No session selected</div>
+  <div id="tabs">
+    <button class="tab" data-tab="reqHeaders">Request Headers</button>
+    <button class="tab" data-tab="reqBody">Request Body</button>
+    <button class="tab" data-tab="resHeaders">Response Headers</button>
+    <button class="tab active" data-tab="resBody">Response Body</button>
+  </div>
+  <pre id="inspectorPre"></pre>
+</div>
+
+<footer>
+  Capture traffic: point any client at HTTP proxy <b>127.0.0.1:8888</b> - try <b>curl -x http://127.0.0.1:8888 http://example.com</b> - or set macOS System Settings, Wi-Fi, Details, Proxies, Web Proxy (HTTP) = 127.0.0.1:8888.
+  HTTPS appears as CONNECT tunnels (encrypted - body capture would need a CA cert, not included). Or fire API calls from the Composer.
+</footer>
+
+<script src="renderer.js"></script>
+</body>
+</html>

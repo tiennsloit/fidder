@@ -1,0 +1,15 @@
+directories:
+  output: ''
+  buildResources: build
+appId: com.joseph.fiddler
+productName: Fiddler
+mac:
+  target: dmg
+  category: public.app-category.utilities
+dmg:
+  title: Fiddler
+  window:
+    width: 660
+    height: 400
+files: []
+electronVersion: 27.3.11

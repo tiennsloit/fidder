@@ -1,0 +1,4 @@
+*.dmg
+*.dmg.*
+node_modules
+mac-arm64
